@@ -28,10 +28,10 @@ class AVRIKHandsCPPCharacter : public ACharacter{
 	class UMotionControllerComponent* MotionControllerR;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character", meta = (AllowPrivateAccess = "true"))
-	class UBoxComponent* TriggerL;
+	class USphereComponent* TriggerL;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character", meta = (AllowPrivateAccess = "true"))
-	class UBoxComponent* TriggerR;
+	class USphereComponent* TriggerR;
 
 public:
 	AVRIKHandsCPPCharacter();
@@ -115,8 +115,8 @@ public:
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
-	FORCEINLINE class UBoxComponent* GetBoxColliderL() const { return TriggerL; }
-	FORCEINLINE class UBoxComponent* GetBoxColliderR() const { return TriggerR; }
+	FORCEINLINE class USphereComponent* GetBoxColliderL() const { return TriggerL; }
+	FORCEINLINE class USphereComponent* GetBoxColliderR() const { return TriggerR; }
 
 	FORCEINLINE bool GetIsGripLeft() { return bIsGripLeft; }
 	FORCEINLINE bool GetIsGripRight() { return bIsGripRight; }

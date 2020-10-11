@@ -9,7 +9,7 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "MotionControllerComponent.h"
-#include "Components/BoxComponent.h"
+#include "Components/SphereComponent.h"
 #include "IGrabItems.h"
 #include "Item.h"
 
@@ -62,14 +62,18 @@ AVRIKHandsCPPCharacter::AVRIKHandsCPPCharacter(){
 	MotionControllerR = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("MotionControllerR"));
 	MotionControllerR->SetupAttachment(VROrigin);
 
-	TriggerL = CreateDefaultSubobject<UBoxComponent>(TEXT("TriggerL"));
+	TriggerL = CreateDefaultSubobject<USphereComponent>(TEXT("TriggerL"));
 	TriggerL->SetCollisionProfileName(TEXT("OverlapAll"));
 	TriggerL->SetGenerateOverlapEvents(true);
+	TriggerL->SetSphereRadius(10.0f);
+	//TriggerL->SetRelativeLocation(FVector(15.0f,0.0f,0.0f));
 	TriggerL->SetupAttachment(MotionControllerL);
 
-	TriggerR = CreateDefaultSubobject<UBoxComponent>(TEXT("TriggerR"));
+	TriggerR = CreateDefaultSubobject<USphereComponent>(TEXT("TriggerR"));
 	TriggerR->SetCollisionProfileName(TEXT("OverlapAll"));
 	TriggerR->SetGenerateOverlapEvents(true);
+	TriggerR->SetSphereRadius(10.0f);
+	//TriggerR->SetRelativeLocation(FVector(5.0f, -5.0f, 0.0f));
 	TriggerR->SetupAttachment(MotionControllerR);
 
 	bIsGripRight = false;
@@ -95,6 +99,9 @@ void AVRIKHandsCPPCharacter::BeginPlay() {
 	TriggerL->OnComponentEndOverlap.AddDynamic(this, &AVRIKHandsCPPCharacter::OnBoxEndOverlapL);
 	TriggerR->OnComponentBeginOverlap.AddDynamic(this, &AVRIKHandsCPPCharacter::OnBoxBeginOverlapR);
 	TriggerR->OnComponentEndOverlap.AddDynamic(this, &AVRIKHandsCPPCharacter::OnBoxEndOverlapR);
+
+	TriggerL->SetRelativeLocation(FVector(5.0f, 5.0f, 0.0f));
+	TriggerR->SetRelativeLocation(FVector(5.0f, -5.0f, 0.0f));
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -122,7 +129,7 @@ void AVRIKHandsCPPCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 	PlayerInputComponent->BindTouch(IE_Released, this, &AVRIKHandsCPPCharacter::TouchStopped);
 
 	// VR headset functionality
-	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &AVRIKHandsCPPCharacter::OnResetVR);
+	//PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &AVRIKHandsCPPCharacter::OnResetVR);
 	PlayerInputComponent->BindAction("GripRight", IE_Pressed, this, &AVRIKHandsCPPCharacter::OnGripRight);
 	PlayerInputComponent->BindAction("GripRight", IE_Released, this, &AVRIKHandsCPPCharacter::OnReleaseRight);
 	PlayerInputComponent->BindAction("GripLeft", IE_Pressed, this, &AVRIKHandsCPPCharacter::OnGripLeft);
@@ -149,7 +156,7 @@ void AVRIKHandsCPPCharacter::OnGripRight(){
 void AVRIKHandsCPPCharacter::OnReleaseRight() {
 	bIsGripRight = false;
 	if (bCanBeGrabbedR) {
-		OnGrabR(bIsGripRight);
+		OnReleaseR(bIsGripRight);
 	}
 }
 
@@ -163,7 +170,7 @@ void AVRIKHandsCPPCharacter::OnGripLeft() {
 void AVRIKHandsCPPCharacter::OnReleaseLeft() {
 	bIsGripLeft = false;
 	if (bCanBeGrabbedL) {
-		OnGrabL(bIsGripLeft);
+		OnReleaseL(bIsGripLeft);
 	}
 }
 
@@ -171,7 +178,10 @@ void AVRIKHandsCPPCharacter::OnGrabL(bool bIsGrabbedParam) {
 	if (CurrentItem) {
 		AItem* Item = Cast<AItem>(CurrentItem);
 		if (Item) {
-			Item->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, "hand_lSocket");
+			if (Item->GetVisualMesh()) {
+				Item->GetVisualMesh()->SetSimulatePhysics(false);
+				Item->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepWorldTransform, "hand_lSocket");
+			}
 		}
 	}
 }
@@ -180,7 +190,10 @@ void AVRIKHandsCPPCharacter::OnGrabR(bool bIsGrabbedParam) {
 	if (CurrentItem) {
 		AItem* Item = Cast<AItem>(CurrentItem);
 		if (Item) {
-			Item->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, "hand_rSocket");
+			if (Item->GetVisualMesh()) {
+				Item->GetVisualMesh()->SetSimulatePhysics(false);
+				Item->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepWorldTransform, "hand_rSocket");
+			}
 		}
 	}
 }
@@ -189,7 +202,10 @@ void AVRIKHandsCPPCharacter::OnReleaseL(bool bIsGrabbedParam){
 	if (CurrentItem) {
 		AItem* Item = Cast<AItem>(CurrentItem);
 		if (Item) {
-			Item->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+			if (Item->GetVisualMesh()) {
+				Item->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+				Item->GetVisualMesh()->SetSimulatePhysics(true);
+			}
 		}
 	}
 }
@@ -198,7 +214,10 @@ void AVRIKHandsCPPCharacter::OnReleaseR(bool bIsGrabbedParam){
 	if (CurrentItem) {
 		AItem* Item = Cast<AItem>(CurrentItem);
 		if (Item) {
-			Item->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+			if (Item->GetVisualMesh()) {
+				Item->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+				Item->GetVisualMesh()->SetSimulatePhysics(true);
+			}
 		}
 	}
 }
@@ -260,7 +279,7 @@ void AVRIKHandsCPPCharacter::OnBoxEndOverlapL(UPrimitiveComponent* OverlappedCom
 	if (OtherActor && (OtherActor != this)) {
 		IIGrabItems* Item = Cast<IIGrabItems>(OtherActor);
 		if (Item) {
-			CurrentItem = nullptr;
+			//CurrentItem = nullptr;
 			bCanBeGrabbedL = false;
 		}
 	}
@@ -280,7 +299,7 @@ void AVRIKHandsCPPCharacter::OnBoxEndOverlapR(UPrimitiveComponent* OverlappedCom
 	if (OtherActor && (OtherActor != this)) {
 		IIGrabItems* Item = Cast<IIGrabItems>(OtherActor);
 		if (Item) {
-			CurrentItem = nullptr;
+			//CurrentItem = nullptr;
 			bCanBeGrabbedR = false;
 		}
 	}

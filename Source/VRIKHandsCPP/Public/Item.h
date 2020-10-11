@@ -24,9 +24,6 @@ protected:
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item", meta = (AllowPrivateAccess = "true"))
-	class USceneComponent* Root;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item", meta = (AllowPrivateAccess = "true"))
 	class UStaticMeshComponent* VisualMesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item", meta = (AllowPrivateAccess = "true"))
@@ -35,8 +32,7 @@ private:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	FORCEINLINE class USceneComponent* GetMotionControllerL() const { return Root; }
-	FORCEINLINE class UStaticMeshComponent* GetMotionControllerR() const { return VisualMesh; }
+	FORCEINLINE class UStaticMeshComponent* GetVisualMesh() const { return VisualMesh; }
 	FORCEINLINE class UBoxComponent* GetBox() const { return Trigger; }
 	FORCEINLINE const AItem* GetThis() const { return this; }
 };

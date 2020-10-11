@@ -10,17 +10,14 @@
 AItem::AItem(){
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
-
-	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
-	RootComponent = Root;
 	
 	VisualMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VisualMesh"));
-	VisualMesh->SetupAttachment(Root);
+	RootComponent = VisualMesh;
 
 	Trigger = CreateDefaultSubobject<UBoxComponent>(TEXT("Trigger"));
 	Trigger->SetCollisionProfileName(TEXT("OverlapAll"));
 	Trigger->SetGenerateOverlapEvents(true);
-	Trigger->SetupAttachment(Root);
+	Trigger->SetupAttachment(VisualMesh);
 }
 
 void AItem::Grab(){
