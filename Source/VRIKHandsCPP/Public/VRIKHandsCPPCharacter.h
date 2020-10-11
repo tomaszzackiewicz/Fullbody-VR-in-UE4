@@ -76,6 +76,8 @@ protected:
 	void OnGripLeft();
 	void OnReleaseLeft();
 
+	void OnCrouch();
+
 	/** Called for forwards/backward input */
 	void MoveForward(float Value);
 
@@ -120,6 +122,7 @@ public:
 
 	FORCEINLINE bool GetIsGripLeft() { return bIsGripLeft; }
 	FORCEINLINE bool GetIsGripRight() { return bIsGripRight; }
+	FORCEINLINE bool GetIsCrouched() { return bIsCrouched; }
 
 	UFUNCTION()
 	void OnBoxBeginOverlapL(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -138,5 +141,10 @@ private:
 		bool bCanBeGrabbedR;
 
 		class IIGrabItems* CurrentItem;
+
+		bool bIsCrouched;
+
+		float CrouchSpeed;
+		float WalkSpeed;
 };
 

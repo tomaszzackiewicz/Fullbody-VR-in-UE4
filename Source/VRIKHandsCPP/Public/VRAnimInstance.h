@@ -60,11 +60,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VRAnimInstance")
 	FTransform MotionControllerRTransform;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VRAnimInstance")
+	bool bIsCrouched;
+
 	FVector Velocity;
 
 	FRotator Rotation;
 
+	void SetIsCrouched(bool isCrouchedParam);
+
 private:
 	void UpdateAnimationProperties();
+
+	
 	
 };

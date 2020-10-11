@@ -12,6 +12,7 @@
 #include "Components/SphereComponent.h"
 #include "IGrabItems.h"
 #include "Item.h"
+#include "VRAnimInstance.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AVRIKHandsCPPCharacter
@@ -80,6 +81,10 @@ AVRIKHandsCPPCharacter::AVRIKHandsCPPCharacter(){
 	bIsGripLeft = false;
 	bCanBeGrabbedL = false;
 	bCanBeGrabbedR = false;
+	bIsCrouched = false;
+
+	CrouchSpeed = 0;
+	WalkSpeed = this->GetCharacterMovement()->MaxWalkSpeed;
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
@@ -134,6 +139,7 @@ void AVRIKHandsCPPCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 	PlayerInputComponent->BindAction("GripRight", IE_Released, this, &AVRIKHandsCPPCharacter::OnReleaseRight);
 	PlayerInputComponent->BindAction("GripLeft", IE_Pressed, this, &AVRIKHandsCPPCharacter::OnGripLeft);
 	PlayerInputComponent->BindAction("GripLeft", IE_Released, this, &AVRIKHandsCPPCharacter::OnReleaseLeft);
+	PlayerInputComponent->BindAction("Crouch", IE_Released, this, &AVRIKHandsCPPCharacter::OnCrouch);
 }
 
 void AVRIKHandsCPPCharacter::Tick(float DeltaTime) {
@@ -171,6 +177,20 @@ void AVRIKHandsCPPCharacter::OnReleaseLeft() {
 	bIsGripLeft = false;
 	if (bCanBeGrabbedL) {
 		OnReleaseL(bIsGripLeft);
+	}
+}
+
+void AVRIKHandsCPPCharacter::OnCrouch(){
+	bIsCrouched = !bIsCrouched;
+	if (bIsCrouched) {
+		this->GetCharacterMovement()->MaxWalkSpeed = CrouchSpeed;
+	}else {
+		this->GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+	}
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	UVRAnimInstance* VRAnimInstance = Cast<UVRAnimInstance>(AnimInstance);
+	if (VRAnimInstance) {
+		VRAnimInstance->SetIsCrouched(bIsCrouched);
 	}
 }
 

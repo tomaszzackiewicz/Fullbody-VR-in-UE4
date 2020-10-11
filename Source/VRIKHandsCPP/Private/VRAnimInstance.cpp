@@ -53,3 +53,7 @@ void UVRAnimInstance::UpdateAnimationProperties() {
 	MotionControllerLTransform = MotionControllerL->GetComponentTransform();
 	MotionControllerRTransform = MotionControllerR->GetComponentTransform();
 }
+
+void UVRAnimInstance::SetIsCrouched(bool isCrouchedParam){
+	bIsCrouched = isCrouchedParam;
+}
